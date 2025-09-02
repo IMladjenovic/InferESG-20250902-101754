@@ -22,9 +22,9 @@ async def test_report_on_file_upload(mocker):
     request_upload_file = UploadFile(file=file, size=12, headers=headers, filename="test.txt")
     response = await report_on_file_upload(request_upload_file)
 
-    report_upload = FileUploadReport(filename=file_upload["filename"],
-                                     id=file_upload["uploadId"],
-                                     report="#Report on upload as markdown")
+    report_upload = FileUploadReport(
+        filename=file_upload["filename"], id=file_upload["uploadId"], report="#Report on upload as markdown"
+    )
     mock_handle_file_upload.assert_called_once_with(request_upload_file)
     mock_store_report.assert_called_once_with(report_upload)
 

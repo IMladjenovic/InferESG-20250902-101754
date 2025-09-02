@@ -5,8 +5,8 @@ from src.utils.scratchpad import clear_scratchpad, update_scratchpad
 from src.utils.file_utils import handle_file_upload
 from src.agents import get_report_agent
 
-async def report_on_file_upload(upload: UploadFile) -> FileUploadReport:
 
+async def report_on_file_upload(upload: UploadFile) -> FileUploadReport:
     file = handle_file_upload(upload)
 
     update_scratchpad(result=file["content"])

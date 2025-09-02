@@ -49,6 +49,7 @@ def test_chat_response_failure(mocker):
     assert response.status_code == 500
     assert response.json() == chat_fail_response
 
+
 def test_chat_delete(mocker):
     mock_reset_session = mocker.patch("src.api.app.reset_session")
     mock_clear_files = mocker.patch("src.api.app.clear_session_file_uploads")
@@ -60,6 +61,7 @@ def test_chat_delete(mocker):
 
     assert response.status_code == 204
 
+
 def test_chat_message_success(mocker):
     message = ChatResponse(id="1", question="Question", answer="Answer", reasoning="Reasoning", dataset="dataset")
     mock_get_chat_message = mocker.patch("src.api.app.get_chat_message", return_value=message)
@@ -70,6 +72,7 @@ def test_chat_message_success(mocker):
     assert response.status_code == 200
     assert response.json() == message
 
+
 def test_chat_message_not_found(mocker):
     mock_get_chat_message = mocker.patch("src.api.app.get_chat_message", return_value=None)
 
@@ -77,6 +80,7 @@ def test_chat_message_not_found(mocker):
 
     mock_get_chat_message.assert_called_with("123")
     assert response.status_code == 404
+
 
 def test_report_response_success(mocker):
     mock_reponse = FileUploadReport(filename="filename", id="1", report="some report md")
@@ -86,7 +90,8 @@ def test_report_response_success(mocker):
 
     mock_report.assert_called_once()
     assert response.status_code == 200
-    assert response.json() == {'filename': 'filename', 'id': '1', 'report': 'some report md'}
+    assert response.json() == {"filename": "filename", "id": "1", "report": "some report md"}
+
 
 @pytest.mark.asyncio
 async def test_lifespan_populates_db(mocker) -> None:
@@ -94,6 +99,7 @@ async def test_lifespan_populates_db(mocker) -> None:
 
     with client:
         mock_dataset_upload.assert_called_once_with()
+
 
 def test_get_report_success(mocker):
     report = FileUploadReport(id="12", filename="test.pdf", report="test report")
@@ -103,8 +109,9 @@ def test_get_report_success(mocker):
 
     mock_get_report.assert_called_with("12")
     assert response.status_code == 200
-    assert response.headers.get('Content-Disposition') == 'attachment; filename="report.md"'
-    assert response.headers.get('Content-Type') == 'text/markdown; charset=utf-8'
+    assert response.headers.get("Content-Disposition") == 'attachment; filename="report.md"'
+    assert response.headers.get("Content-Type") == "text/markdown; charset=utf-8"
+
 
 def test_get_report_not_found(mocker):
     mock_get_report = mocker.patch("src.api.app.get_report", return_value=None)

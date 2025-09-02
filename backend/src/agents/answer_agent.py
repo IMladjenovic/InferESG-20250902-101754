@@ -16,10 +16,7 @@ class AnswerAgent(Agent):
     async def invoke(self, utterance: str) -> str:
         final_scratchpad = get_scratchpad()
         create_answer = engine.load_prompt(
-            "create-answer",
-            chat_history=get_session_chat(),
-            final_scratchpad=final_scratchpad,
-            datetime=datetime.now()
+            "create-answer", chat_history=get_session_chat(), final_scratchpad=final_scratchpad, datetime=datetime.now()
         )
 
         return await self.llm.chat(self.model, create_answer, user_prompt=utterance)

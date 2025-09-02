@@ -6,6 +6,7 @@ from src.llm.factory import get_llm
 mock_model = "mockmodel"
 mock_llm = get_llm("mockllm")
 
+
 @pytest.mark.asyncio
 async def test_invoke_calls_llm(mocker):
     report_agent = ReportAgent(llm_name="mockllm", model=mock_model)
@@ -16,4 +17,3 @@ async def test_invoke_calls_llm(mocker):
     response = await report_agent.invoke("Test Document")
 
     assert response == mock_response
-

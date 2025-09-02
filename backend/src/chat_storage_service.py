@@ -1,4 +1,3 @@
-
 import json
 from typing import TypedDict
 import redis
@@ -6,12 +5,14 @@ import redis
 from src.utils.json import try_parse_to_json
 from src.utils import Config
 
+
 class ChatResponse(TypedDict):
     id: str
-    question:str
+    question: str
     answer: str
     dataset: str | None
     reasoning: str | None
+
 
 config = Config()
 
@@ -19,7 +20,8 @@ redis_client = redis.Redis(host=config.redis_host, port=6379, decode_responses=T
 
 CHAT_KEY_PREFIX = "chat_"
 
-def store_chat_message(chat:ChatResponse):
+
+def store_chat_message(chat: ChatResponse):
     redis_client.set(CHAT_KEY_PREFIX + chat["id"], json.dumps(chat))
 
 

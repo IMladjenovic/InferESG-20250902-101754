@@ -22,22 +22,20 @@ async def generate_dynamic_knowledge_graph(csv_data: list[list[str]]) -> dict[st
     model_response = await llm.chat(
         llm_model,  # type: ignore[reportArgumentType]
         model_system_prompt,
-        user_prompt=str(reduced_data_set)
+        user_prompt=str(reduced_data_set),
     )
 
     data_model = json.loads(model_response)["model"]
 
     system_prompt = engine.load_prompt("generate-knowledge-graph-cypher-system-prompt")
     user_prompt = engine.load_prompt(
-        "generate-knowledge-graph-cypher-user-prompt",
-        input_data=reduced_data_set,
-        data_model=data_model
+        "generate-knowledge-graph-cypher-user-prompt", input_data=reduced_data_set, data_model=data_model
     )
 
     query_response = await llm.chat(
         llm_model,  # type: ignore[reportArgumentType]
         system_prompt,
-        user_prompt=user_prompt
+        user_prompt=user_prompt,
     )
 
     query = json.loads(query_response)["cypher_query"]
