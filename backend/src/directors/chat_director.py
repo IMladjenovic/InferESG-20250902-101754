@@ -21,6 +21,7 @@ config = Config()
 engine = PromptEngine()
 director_prompt = engine.load_prompt("chat_director")
 
+
 @dataclass
 class FinalAnswer:
     message: str = ""
@@ -46,11 +47,13 @@ async def question(question: str) -> ChatResponse:
             generated_figure = entry["result"]
             await connection_manager.send_chart({"type": "image", "data": generated_figure})
             clear_scratchpad()
-            return ChatResponse(id=str(uuid4()),
-                                question=question,
-                                answer="",
-                                dataset=None,
-                                reasoning=try_pretty_print(current_scratchpad))
+            return ChatResponse(
+                id=str(uuid4()),
+                question=question,
+                answer="",
+                dataset=None,
+                reasoning=try_pretty_print(current_scratchpad),
+            )
 
     final_answer = FinalAnswer()
     try:
@@ -62,11 +65,13 @@ async def question(question: str) -> ChatResponse:
 
     logger.info(f"final answer: {final_answer}")
 
-    response = ChatResponse(id=str(uuid4()),
-                            question=question,
-                            answer=final_answer.message or '',
-                            dataset=final_answer.dataset,
-                            reasoning=try_pretty_print(current_scratchpad))
+    response = ChatResponse(
+        id=str(uuid4()),
+        question=question,
+        answer=final_answer.message or "",
+        dataset=final_answer.dataset,
+        reasoning=try_pretty_print(current_scratchpad),
+    )
 
     store_chat_message(response)
 
@@ -77,10 +82,10 @@ async def question(question: str) -> ChatResponse:
 
 async def __create_final_answer(question: str, intent_json: dict) -> FinalAnswer:
     dataset = None
-    if intent_json['result_type'] == 'dataset':
+    if intent_json["result_type"] == "dataset":
         # get the last DatastoreAgent result dataset from the scratchpad
-        datastore_agents = [scratch for scratch in get_scratchpad() if scratch['agent_name'] == 'DatastoreAgent']
-        query_result = datastore_agents[-1]['result'] if datastore_agents else None
+        datastore_agents = [scratch for scratch in get_scratchpad() if scratch["agent_name"] == "DatastoreAgent"]
+        query_result = datastore_agents[-1]["result"] if datastore_agents else None
         if query_result is not None:
             dataset = query_result
 
@@ -96,11 +101,8 @@ async def dataset_upload() -> None:
         logger.info("Skipping database population as already has data")
         return
 
-    with open(dataset_file, 'r') as file:
-        csv_data = [
-            [entry for entry in line.strip('\n').split(",")]
-            for line in file
-        ]
+    with open(dataset_file, "r") as file:
+        csv_data = [[entry for entry in line.strip("\n").split(",")] for line in file]
 
     knowledge_graph_config = await generate_dynamic_knowledge_graph(csv_data)
 

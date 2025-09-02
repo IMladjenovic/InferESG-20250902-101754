@@ -17,7 +17,7 @@ validator_prompt = engine.load_prompt("validator")
 class ValidatorAgent(Agent):
     async def invoke(self, utterance: str) -> str:
         answer = await self.llm.chat(self.model, validator_prompt, utterance)
-        response = json.loads(answer)['response']
+        response = json.loads(answer)["response"]
         await publish_log_info(LogPrefix.USER, f"Validating: '{utterance}' Answer: '{response}'", __name__)
 
         return response

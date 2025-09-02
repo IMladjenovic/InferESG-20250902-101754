@@ -133,6 +133,7 @@ async def report(file: UploadFile):
         logger.exception(e)
         return JSONResponse(status_code=500, content=file_upload_failed_response)
 
+
 @app.get("/report/{id}")
 def download_report(id: str):
     logger.info(f"Get report download called for id: {id}")
@@ -140,11 +141,12 @@ def download_report(id: str):
         final_result = get_report(id)
         if final_result is None:
             return JSONResponse(status_code=404, content=f"Message with id {id} not found")
-        headers = {'Content-Disposition': 'attachment; filename="report.md"'}
-        return Response(final_result.get("report"), headers=headers, media_type='text/markdown')
+        headers = {"Content-Disposition": 'attachment; filename="report.md"'}
+        return Response(final_result.get("report"), headers=headers, media_type="text/markdown")
     except Exception as e:
         logger.exception(e)
         return JSONResponse(status_code=500, content=report_get_upload_failed_response)
+
 
 @app.get("/uploadfile")
 async def fetch_file(id: str):

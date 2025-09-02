@@ -15,8 +15,7 @@ async def generate_suggestions() -> List[str]:
     llm = get_llm(config.suggestions_llm)
     model = get_suggestions_model()
     chat_history = get_chat_history()
-    suggestions_prompt = engine.load_prompt(
-        "generate-message-suggestions", chat_history=chat_history)
+    suggestions_prompt = engine.load_prompt("generate-message-suggestions", chat_history=chat_history)
     response = await llm.chat(model, suggestions_prompt, user_prompt="Give me 5 suggestions.", return_json=True)
     try:
         response_json = json.loads(response)
@@ -55,8 +54,7 @@ def remove_datasets_from_history(history: list[Message]) -> List[str]:
             if message["content"] is not None:
                 try:
                     natural_language_answer = json.loads(message["content"])
-                    filtered.append(
-                        f"System: {natural_language_answer['final_answer']}")
+                    filtered.append(f"System: {natural_language_answer['final_answer']}")
                 except json.JSONDecodeError:
                     filtered.append(f"System: {message['content']}")
 

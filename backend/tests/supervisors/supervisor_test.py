@@ -49,14 +49,10 @@ async def test_solve_all_gets_answer(mocker):
     assert result == expected_result
 
 
-
 @pytest.mark.asyncio
 async def test_solve_task_first_attempt_solves(mocker):
     # Mock the agent to return a JSON-formatted answer with a 'content' field
-    mock_answer = json.dumps({
-        "content": "the answer is 42",
-        "ignore_validation": "false"
-    })
+    mock_answer = json.dumps({"content": "the answer is 42", "ignore_validation": "false"})
     agent.invoke = mocker.AsyncMock(return_value=mock_answer)
     mocker.patch("src.supervisors.supervisor.get_agent_for_task", return_value=agent)
     mocker.patch("src.supervisors.supervisor.is_valid_answer", return_value=True)
@@ -64,16 +60,13 @@ async def test_solve_task_first_attempt_solves(mocker):
     mock_answer_json = json.loads(mock_answer)
 
     # Ensure that the result is returned directly without validation
-    assert answer == (agent.name, mock_answer_json.get('content', ''), "success")
+    assert answer == (agent.name, mock_answer_json.get("content", ""), "success")
 
 
 @pytest.mark.asyncio
 async def test_solve_task_ignore_validation(mocker):
     # Mock the agent to return a JSON-formatted answer with ignore_validation as true
-    mock_answer = json.dumps({
-        "content": "the answer is 42",
-        "ignore_validation": "true"
-    })
+    mock_answer = json.dumps({"content": "the answer is 42", "ignore_validation": "true"})
     agent.invoke = mocker.AsyncMock(return_value=mock_answer)
     mocker.patch("src.supervisors.supervisor.get_agent_for_task", return_value=agent)
     mock_is_valid_answer = mocker.patch("src.supervisors.supervisor.is_valid_answer")
@@ -83,8 +76,9 @@ async def test_solve_task_ignore_validation(mocker):
     mock_answer_json = json.loads(mock_answer)
 
     # Ensure that the result is returned directly without validation
-    assert answer == (agent.name, mock_answer_json.get('content', ''), "success")
+    assert answer == (agent.name, mock_answer_json.get("content", ""), "success")
     mock_is_valid_answer.assert_not_called()  # Validation should not be called
+
 
 @pytest.mark.asyncio
 async def test_solve_task_unsolvable(mocker):

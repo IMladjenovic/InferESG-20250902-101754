@@ -28,8 +28,7 @@ class OpenAI(LLM):
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0,
-                response_format={
-                    "type": "json_object"} if return_json else NOT_GIVEN,
+                response_format={"type": "json_object"} if return_json else NOT_GIVEN,
             )
             content = response.choices[0].message.content
             logger.info(f"OpenAI response: Finish reason: {response.choices[0].finish_reason}, Content: {content}")
