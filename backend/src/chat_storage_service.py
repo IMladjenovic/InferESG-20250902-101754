@@ -1,6 +1,5 @@
 
 import json
-import logging
 from typing import TypedDict
 import redis
 
@@ -11,9 +10,8 @@ class ChatResponse(TypedDict):
     id: str
     question:str
     answer: str
+    dataset: str | None
     reasoning: str | None
-
-logger = logging.getLogger(__name__)
 
 config = Config()
 

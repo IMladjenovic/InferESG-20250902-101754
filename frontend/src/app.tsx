@@ -4,11 +4,11 @@ import { Chat } from './components/chat';
 import { Input } from './components/input';
 import { useMessages } from './useMessages';
 import { NavBar } from './components/navbar';
-import closeIcon from './icons/close.svg';
-import { IconButton } from './components/icon-button';
+import { Sidebar } from './components/sidebar';
 
 export const App = () => {
   const {
+    appendMessage,
     sendMessage,
     messages,
     waiting,
@@ -29,18 +29,10 @@ export const App = () => {
       <div className={styles.container}>
         {selectedMessage && (
           <div className={styles.column}>
-            <div className={styles.sidepanel}>
-              <div className={styles.close_container}>
-                <IconButton
-                  icon={closeIcon}
-                  altText="Close"
-                  onClick={() => selectMessage(null)}
-                />
-              </div>
-              <p>id: {selectedMessage.id}</p>
-              <p>message: {selectedMessage.content}</p>
-              <p>time: {selectedMessage.time}</p>
-            </div>
+            <Sidebar
+              selectedMessage={selectedMessage}
+              selectMessage={selectMessage}
+            />
           </div>
         )}
         <div className={styles.column}>
@@ -56,6 +48,7 @@ export const App = () => {
               sendMessage={sendMessage}
               waiting={waiting}
               suggestions={suggestions}
+              appendMessage={appendMessage}
             />
           </div>
         </div>

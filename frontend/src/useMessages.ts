@@ -25,6 +25,7 @@ const starterMessage: Message = {
 };
 
 export interface UseMessagesHook {
+  appendMessage: (response: ChatMessageResponse, role: Role) => void;
   sendMessage: (message: string) => void;
   resetMessages: () => void;
   initSuggestions: () => void;
@@ -49,7 +50,12 @@ export const useMessages = (): UseMessagesHook => {
   }, []);
 
   const appendMessage = useCallback(
-    (response: ChatMessageResponse, role: Role) => {
+    (
+      response: ChatMessageResponse,
+      role: Role,
+      report?: string,
+      sidePanelTitle?: string,
+    ) => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -57,7 +63,10 @@ export const useMessages = (): UseMessagesHook => {
           id: response.id,
           content: response.answer,
           reasoning: response.reasoning,
+          dataset: response.dataset,
           time: new Date().toLocaleTimeString(),
+          report,
+          sidePanelTitle,
         },
       ]);
     },
@@ -82,11 +91,13 @@ export const useMessages = (): UseMessagesHook => {
     await resetChat();
     setWaiting(false);
     setMessages([{ ...starterMessage, time: new Date().toLocaleTimeString() }]);
+    selectMessage(null);
     setSuggestions([]);
     fetchSuggestions();
   }, []);
 
   return {
+    appendMessage,
     sendMessage,
     messages,
     suggestions,

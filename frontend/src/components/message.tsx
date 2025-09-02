@@ -5,6 +5,7 @@ import UserIcon from '../icons/account-circle.svg';
 import BotIcon from '../icons/logomark.svg';
 import ChevronIcon from '../icons/chevron.svg';
 import OpenGridIcon from '../icons/open-grid.svg';
+import DownloadIcon from '../icons/download.svg';
 import { Button } from './button';
 
 export enum Role {
@@ -18,6 +19,10 @@ export interface Message {
   content: string;
   reasoning?: string;
   time: string;
+  report?: string;
+  sidePanelTitle?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dataset?: null | any;
 }
 
 export interface MessageProps {
@@ -47,7 +52,7 @@ export const MessageComponent = ({
   selectMessage,
   selectedMessage,
 }: MessageProps) => {
-  const { content, role, reasoning } = message;
+  const { content, role, reasoning, report, dataset } = message;
 
   const { class: roleClass, icon } = roleStyleMap[role];
 
@@ -59,17 +64,28 @@ export const MessageComponent = ({
         <img src={icon} className={styles.iconStyle} />
         <p className={styles.messageStyle}>{content}</p>
       </div>
-      {role == Role.Bot && false && (
+      {(report || dataset) && (
         <div className={styles.selectMessage}>
           <Button
             isOutline
             isPressed={message === selectedMessage}
-            text="Select message"
+            text={report ? 'View report' : 'View data grid'}
             icon={OpenGridIcon}
             onClick={() =>
               selectMessage(message === selectedMessage ? null : message)
             }
           />
+          {report && (
+            <>
+              <span className={styles.button_spacer} />
+              <Button
+                isDownload
+                text="Download report"
+                icon={DownloadIcon}
+                href={`${process.env.BACKEND_URL}/report/${message.id}`}
+              />
+            </>
+          )}
         </div>
       )}
       {role == Role.Bot && reasoning && (

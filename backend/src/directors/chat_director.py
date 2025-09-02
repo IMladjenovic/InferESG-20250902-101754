@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 import json
 import logging
+from typing import Optional
 from uuid import uuid4
 
 from src.utils.json import try_pretty_print
@@ -11,13 +13,18 @@ from src.utils.dynamic_knowledge_graph import generate_dynamic_knowledge_graph
 from src.prompts import PromptEngine
 from src.supervisors import solve_all
 from src.utils import Config
-from src.utils.graph_db_utils import populate_db
+from src.utils.graph_db_utils import populate_db, is_db_populated
 from src.websockets.connection_manager import connection_manager
 
 logger = logging.getLogger(__name__)
 config = Config()
 engine = PromptEngine()
 director_prompt = engine.load_prompt("chat_director")
+
+@dataclass
+class FinalAnswer:
+    message: str = ""
+    dataset: Optional[str] = None
 
 
 async def question(question: str) -> ChatResponse:
@@ -42,15 +49,23 @@ async def question(question: str) -> ChatResponse:
             return ChatResponse(id=str(uuid4()),
                                 question=question,
                                 answer="",
+                                dataset=None,
                                 reasoning=try_pretty_print(current_scratchpad))
 
-    final_answer = await get_answer_agent().invoke(question)
-    update_session_chat(role="system", content=final_answer)
+    final_answer = FinalAnswer()
+    try:
+        final_answer = await __create_final_answer(question, intent_json)
+        update_session_chat(role="system", content=final_answer.message)
+    except Exception as error:
+        logger.error(f"Error during answer generation: {error}", error)
+        update_scratchpad(error=str(error))
+
     logger.info(f"final answer: {final_answer}")
 
     response = ChatResponse(id=str(uuid4()),
                             question=question,
-                            answer=final_answer,
+                            answer=final_answer.message or '',
+                            dataset=final_answer.dataset,
                             reasoning=try_pretty_print(current_scratchpad))
 
     store_chat_message(response)
@@ -60,8 +75,26 @@ async def question(question: str) -> ChatResponse:
     return response
 
 
+async def __create_final_answer(question: str, intent_json: dict) -> FinalAnswer:
+    dataset = None
+    if intent_json['result_type'] == 'dataset':
+        # get the last DatastoreAgent result dataset from the scratchpad
+        datastore_agents = [scratch for scratch in get_scratchpad() if scratch['agent_name'] == 'DatastoreAgent']
+        query_result = datastore_agents[-1]['result'] if datastore_agents else None
+        if query_result is not None:
+            dataset = query_result
+
+    message = await get_answer_agent().invoke(question)
+
+    return FinalAnswer(message, dataset)
+
+
 async def dataset_upload() -> None:
     dataset_file = "./datasets/bloomberg.csv"
+
+    if is_db_populated():
+        logger.info("Skipping database population as already has data")
+        return
 
     with open(dataset_file, 'r') as file:
         csv_data = [

@@ -12,15 +12,27 @@ import { FileUpload } from './fileUpload';
 import { UploadedFileDisplay } from './uploadedFileDisplay';
 import { Suggestions } from './suggestions';
 import { Button } from './button';
-import { uploadFileToServer } from '../server';
+import { ChatMessageResponse, uploadFileToServer } from '../server';
+import { Role } from './message';
 
 export interface InputProps {
+  appendMessage: (
+    response: ChatMessageResponse,
+    role: Role,
+    report?: string,
+    sidePanelTitle?: string,
+  ) => void;
   sendMessage: (message: string) => void;
   waiting: boolean;
   suggestions: string[];
 }
 
-export const Input = ({ sendMessage, waiting, suggestions }: InputProps) => {
+export const Input = ({
+  appendMessage,
+  sendMessage,
+  waiting,
+  suggestions,
+}: InputProps) => {
   const [userInput, setUserInput] = useState<string>('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState<boolean>(false);
@@ -60,9 +72,17 @@ export const Input = ({ sendMessage, waiting, suggestions }: InputProps) => {
     setUploadInProgress(true);
 
     try {
-      const { filename, id } = await uploadFileToServer(file);
-      console.log(`File uploaded successfully: ${filename} with id ${id}`);
+      const { filename, report, id } = await uploadFileToServer(file);
       setUploadedFile(file);
+      appendMessage(
+        {
+          id,
+          answer: `Your ESG report for ${filename} is ready to view.`,
+        },
+        Role.Bot,
+        report,
+        `ESG Report - ${filename}`,
+      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -87,7 +107,7 @@ export const Input = ({ sendMessage, waiting, suggestions }: InputProps) => {
             <FileUpload
               onFileUpload={uploadFile}
               uploadInProgress={uploadInProgress}
-              disabled={!!uploadedFile}
+              disabled={!!uploadedFile || uploadInProgress}
             />
           </div>
           <div className={styles.sendButtonContainer}>

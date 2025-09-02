@@ -61,7 +61,7 @@ def test_chat_delete(mocker):
     assert response.status_code == 204
 
 def test_chat_message_success(mocker):
-    message = ChatResponse(id="1", question="Question", answer="Answer", reasoning="Reasoning")
+    message = ChatResponse(id="1", question="Question", answer="Answer", reasoning="Reasoning", dataset="dataset")
     mock_get_chat_message = mocker.patch("src.api.app.get_chat_message", return_value=message)
 
     response = client.get("/chat/123")
@@ -94,3 +94,22 @@ async def test_lifespan_populates_db(mocker) -> None:
 
     with client:
         mock_dataset_upload.assert_called_once_with()
+
+def test_get_report_success(mocker):
+    report = FileUploadReport(id="12", filename="test.pdf", report="test report")
+    mock_get_report = mocker.patch("src.api.app.get_report", return_value=report)
+
+    response = client.get("/report/12")
+
+    mock_get_report.assert_called_with("12")
+    assert response.status_code == 200
+    assert response.headers.get('Content-Disposition') == 'attachment; filename="report.md"'
+    assert response.headers.get('Content-Type') == 'text/markdown; charset=utf-8'
+
+def test_get_report_not_found(mocker):
+    mock_get_report = mocker.patch("src.api.app.get_report", return_value=None)
+
+    response = client.get("/report/12")
+
+    mock_get_report.assert_called_with("12")
+    assert response.status_code == 404
