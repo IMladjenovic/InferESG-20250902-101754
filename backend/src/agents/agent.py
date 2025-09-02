@@ -10,8 +10,6 @@ config = Config()
 class Agent(ABC):
     """Base agent class for all agents in the system."""
 
-    name: str
-    description: str
     llm: LLM
     model: str
 
@@ -20,10 +18,6 @@ class Agent(ABC):
         if model is None:
             raise ValueError("LLM Model Not Provided")
         self.model = model
-
-    async def invoke(self, utterance: str) -> str:
-        """Process the user's utterance and return a response. Must be implemented by subclasses."""
-        raise NotImplementedError("Subclasses must implement the invoke method")
 
 
 def agent(name: str, description: str, tools: List[Tool]):
