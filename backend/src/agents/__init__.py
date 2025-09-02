@@ -2,6 +2,7 @@ from typing import List
 
 from src.utils import Config
 from src.agents.agent import Agent, agent
+from src.agents.chat_agent import ChatAgent
 from src.agents.datastore_agent import DatastoreAgent
 from src.agents.web_agent import WebAgent
 from src.agents.intent_agent import IntentAgent
@@ -51,6 +52,7 @@ def get_agent_details():
 __all__ = [
     "agent",
     "Agent",
+    "ChatAgent",
     "agent_details",
     "get_agent_details",
     "get_answer_agent",
